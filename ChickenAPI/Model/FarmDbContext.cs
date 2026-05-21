@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit; 
+using System.Reflection.Emit;
 
 namespace ChickenAPI.Model
 {
     public class FarmDbContext : DbContext
     {
-        public DbSet<Chicken> Chicken {get; set;}
+        public DbSet<Chicken> Chicken { get; set; }
 
-        public FarmDbContext(DbContextOptions<FarmDbContext> options) : base(options){}
+        public FarmDbContext(DbContextOptions<FarmDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

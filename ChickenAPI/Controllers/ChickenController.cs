@@ -17,9 +17,9 @@ namespace ChickenAPI.Controllers
             _context = context;
         }
 
-     // GET: api/Chicken
-     [HttpGet]
-     public async Task<ActionResult<IEnumerable<Chicken>>> GetAll()
+        // GET: api/Chicken
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Chicken>>> GetAll()
         {
             return await _context.Chicken.ToListAsync();
         }
@@ -29,10 +29,10 @@ namespace ChickenAPI.Controllers
         public async Task<ActionResult<Chicken>> GetById(int id)
         {
             var chicken = await _context.Chicken.FindAsync(id);
-            if(chicken == null)
+            if (chicken == null)
                 return NotFound();
 
-            return chicken; 
+            return chicken;
 
         }
 
@@ -43,7 +43,7 @@ namespace ChickenAPI.Controllers
             _context.Chicken.Add(chicken);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetById), new {id = chicken.ChickID}, chicken);
+            return CreatedAtAction(nameof(GetById), new { id = chicken.ChickID }, chicken);
         }
 
         // PUT: api/Chicken/{id}
@@ -61,7 +61,7 @@ namespace ChickenAPI.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if(!_context.Chicken.Any(e => e.ChickID == id))
+                if (!_context.Chicken.Any(e => e.ChickID == id))
                     return NotFound();
                 throw;
             }
@@ -73,10 +73,10 @@ namespace ChickenAPI.Controllers
 
         // DELETE: api/Chicken/{id}
         [HttpDelete("(id)")]
-        public async Task<IActionResult> Delete (int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var chicken = await _context.Chicken.FindAsync(id);
-            if(chicken == null)
+            if (chicken == null)
                 return NotFound();
 
             _context.Chicken.Remove(chicken);
