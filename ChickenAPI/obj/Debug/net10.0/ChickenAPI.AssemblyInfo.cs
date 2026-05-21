@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ChickenAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+acdc545f19077e0d2d66365b528579e2330e77e0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e43c5b932e445c56f1b87c31df46d8690ce0d609")]
 [assembly: System.Reflection.AssemblyProductAttribute("ChickenAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ChickenAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

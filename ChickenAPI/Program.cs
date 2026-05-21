@@ -12,7 +12,7 @@ namespace ChickenAPI
             // Add services to the container.
             builder.Services.AddDbContext<FarmDbContext>(options =>
             options.UseSqlServer(Environment.GetEnvironmentVariable("SQL_CONNECTION_STRING")));
-            
+
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();
             var app = builder.Build();
@@ -32,7 +32,7 @@ namespace ChickenAPI
                 var db = scope.ServiceProvider.GetRequiredService<FarmDbContext>();
                 db.Database.Migrate(); // Applies any pending migrations automatically
             }
-            
+
             app.UseHttpsRedirection();
             app.UseAuthorization();
             app.MapControllers();
