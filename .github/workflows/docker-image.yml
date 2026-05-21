@@ -30,7 +30,7 @@ jobs:
         cache-dependency-path: '**/*.csproj'
 
     - name: Verify Code Formatting
-      run: dotnet format --verify-no-changes -severity warn
+      run: dotnet format --verify-no-changes --severity warn
 
     - name: Static Code Analysis
       run: dotnet build --configuration Release /warnaserror
@@ -124,12 +124,3 @@ jobs:
     - name: Execute Server Infrastructure Sync
       run: |
         echo "All automated tests passed cleanly. Initiating production handshake scripts..."
-
-  build:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
