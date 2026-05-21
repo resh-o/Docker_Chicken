@@ -56,7 +56,7 @@ jobs:
     
   # JOB 3: Spins up container layout and evaluates cross-dependency integrations
   integration-testing: 
-    name: 🧪 System Integration Veerification
+    name: 🧪 System Integration Verification
     runs-on: ubuntu-latest
     needs: compile-and-build #Only starts after Docker builds successfully finalize
     steps: 
