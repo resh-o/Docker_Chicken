@@ -27,13 +27,36 @@ namespace ChickenAPI
                 });
             }
 
+            // Replace your current using(var scope...) block with this:
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<FarmDbContext>();
-                db.Database.Migrate(); // Applies any pending migrations automatically
+
+                int retries = 5;
+                while (retries > 0)
+                {
+                    try
+                    {
+                        Console.WriteLine("Attempting to run database migrations...");
+                        db.Database.Migrate();
+                        Console.WriteLine("Database migrations applied successfully!");
+                        break;
+                    }
+                    catch (System.Exception ex)
+                    {
+                        retries--;
+                        Console.WriteLine($"Database not ready yet ({ex.Message}). Retrying in 5 seconds... ({retries} retries left)");
+                        System.Threading.Thread.Sleep(5000);
+                        if (retries == 0) throw;
+                    }
+                }
             }
 
-            app.UseHttpsRedirection();
+            if (!app.Environment.IsDevelopment())
+            {
+                // Only enforce HTTPS if you aren't testing locally/in CI meshes
+                app.UseHttpsRedirection();
+            }
             app.UseAuthorization();
             app.MapControllers();
             app.Run();
