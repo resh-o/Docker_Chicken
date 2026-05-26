@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ChickMVC")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8dcce44dbd07a745faf85aecd8a524d688347699")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a0bdfddb163e2a362e57dce25843988bf118cb67")]
 [assembly: System.Reflection.AssemblyProductAttribute("ChickMVC")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ChickMVC")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
