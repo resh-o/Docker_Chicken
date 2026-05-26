@@ -98,7 +98,7 @@ jobs:
         MVC_RESPONSE=$(curl -s http://localhost:80)
 
         echo "Asserting that the front-end view successfully displays the dynamic API string context..."
-        if echo "$MVC_RESPONSE" | grep -q "Cluck Norris"; then
+        if echo "$MVC_RESPONSE" | grep -q "Here are some eggs!"; then
           echo "SUCCESS: MVC interface successfully fetched and displayed containerized API data!"
         else
           echo "ERROR: Data assertion failed. The MVC home page is not showing the injected database string payload."
