@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Advanced CI/CD Integration Pipeline
 
 on:
   push:
@@ -6,15 +6,15 @@ on:
   pull_request:
     branches: [ "main", "master" ]
 
-concurrency: 
-  group: ${{github.workflow}}-${{github.ref}}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 jobs:
-  # JOB 1: Validates code layout, syntax formatting, and compilation rules early
+  # JOB 1: Evaluates codebase syntax layout, configurations, and warnings early
   code-quality:
     name: 🛡️ Code Quality & Formatting
     runs-on: ubuntu-latest
@@ -35,41 +35,41 @@ jobs:
     - name: Static Code Analysis
       run: dotnet build --configuration Release /warnaserror
 
-  # JOB 2: Compiles the source files inside target docker configurations
+  # JOB 2: Validates compile capability within runner environments
   compile-and-build:
-    name: 🐳 Docker Build & Package
+    name: 🏗️ Docker Build & Package
     runs-on: ubuntu-latest
-    needs: code-quality # Only starts if static formatting checks pass cleanly
-    steps: 
+    needs: code-quality
+    steps:
     - name: Checkout Code
       uses: actions/checkout@v4
 
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4
-      with: 
+      with:
         dotnet-version: '10.0.x'
         cache: true
         cache-dependency-path: '**/*.csproj'
-      
+
     - name: Build Application Containers
       run: docker compose build
-    
-  # JOB 3: Spins up container layout and evaluates cross-dependency integrations
-  integration-testing: 
+
+  # JOB 3: Launches local dependency topologies and handles cross-integration validations
+  integration-testing:
     name: 🧪 System Integration Verification
     runs-on: ubuntu-latest
-    needs: compile-and-build #Only starts after Docker builds successfully finalize
-    steps: 
+    needs: compile-and-build
+    steps:
     - name: Checkout Code
       uses: actions/checkout@v4
 
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4
-      with: 
+      with:
         dotnet-version: '10.0.x'
         cache: true
         cache-dependency-path: '**/*.csproj'
-        
+
     - name: Build and Launch Application Mesh
       run: docker compose up --build -d
 
@@ -77,12 +77,12 @@ jobs:
       run: |
         echo "Giving Microsoft SQL Server 25 seconds to complete table setups..."
         sleep 25
-    
+
     - name: Wait for API Readiness
       run: |
         echo "Waiting for ChickenAPI to wake up at http://localhost:8080..."
         timeout 60s sh -c 'until curl -sSf http://localhost:8080/GetMeEggs > /dev/null; do sleep 2; done'
-        echo "ChickenAPI is up and running"
+        echo "ChickenAPI is up and running!"
 
     - name: Integration Step 1 - Seed Data via API
       run: |
@@ -92,6 +92,19 @@ jobs:
           -d '{"name": "Cluck Norris", "breed": "Rhode Island Red"}' \
           --fail --verbose
 
+    - name: Integration Step 2 - Verify Front-End MVC Data Rendering
+      run: |
+        echo "Querying the MVC web application home page on port 80..."
+        MVC_RESPONSE=$(curl -s http://localhost:80)
+        
+        echo "Asserting that the front-end view successfully displays the dynamic API string context..."
+        if echo "$MVC_RESPONSE" | grep -q "Cluck Norris"; then
+          echo "SUCCESS: MVC interface successfully fetched and displayed containerized API data!"
+        else
+          echo "ERROR: Data assertion failed. The MVC home page is not showing the injected database string payload."
+          exit 1
+        fi
+
     - name: Tear Down Mesh and Logs
       if: always()
       run: |
@@ -100,29 +113,28 @@ jobs:
         docker compose logs mvc-service > mvc-container-debug.log
         docker compose down --volumes
 
-  # JOB 4: Automated continous delivery task gated behind previous validation approvals
+  # JOB 4: Automated secure continuous delivery tasks hitting remote server configurations
   cd-deployment:
     name: 🚀 Production Cloud Deployment
     runs-on: ubuntu-latest
     needs: integration-testing
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    environment: production
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' 
     steps:
     - name: Deploy via SSH to DigitalOcean Droplet
-      uses: appleboy/ssh-action@v1.2.0
+      uses: appleboy/ssh-action@v1.2.0  
       with:
         host: ${{ secrets.DO_DROPLET_IP }}
         key: ${{ secrets.DO_SSH_KEY }}
         username: root
         timeout: 60s
-        command_timeout: 30m # Allowing extra time for Docker pull and container restarts during deployment
+        command_timeout: 30m  # Safeguards long-running .NET restores from throwing timeout errors
         script: |
-          # Target project Directory on the remote server
+          # Target project directory on the remote server
           PROJECT_DIR="dockerchicken"
-
-          # Force Git to explicitily use the droplet's  authorised deploy key file path context
+          
+          # Force Git to explicitly use the Droplet's authorized deploy key file path context
           export GIT_SSH_COMMAND="ssh -i /root/.ssh/id_ed25519 -o IdentitiesOnly=yes"
-
+          
           # Navigate into directory or pull repository via Git over SSH dynamically
           if [ -d "$PROJECT_DIR" ]; then
             cd "$PROJECT_DIR"
@@ -131,59 +143,59 @@ jobs:
             git reset --hard origin/${{ github.ref_name }}
             git pull
           else
-            echo "Initializing remte firectory workspace layout dynamically for ${{ github.repository }}..."
+            echo "Initializing remote directory workspace layout dynamically for ${{ github.repository }}..."
             git clone git@github.com:${{ github.repository }}.git "$PROJECT_DIR"
             cd "$PROJECT_DIR"
           fi
-
+          
           # Bring down older services safely
           echo "Stopping active container clusters..."
           docker compose down
-
+          
           # Run the fresh build and up on the Droplet
           echo "Initiating production runtime compilation environment..."
-          docker compose build -d --build
-
+          docker compose up -d --build
+          
           echo "Deployment completely executed successfully!"
-      
+
   # JOB 5: Connects over the public internet to verify the deployment is accessible globally
   post-deployment-smoke-test:
-    name: 🌐 Live Cloud Smoke Verification
+    name: 🔍 Live Cloud Smoke Verification
     runs-on: ubuntu-latest
     needs: cd-deployment
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     steps:
-    - name: Settle Environment
+    - name: Settle Environments
       run: |
-        echo "Allowing containers 15 seconds to fully complete initial production both cycles..."
+        echo "Allowing containers 15 seconds to fully complete initial production boot cycles..."
         sleep 15
 
     - name: Verify Public REST API Gateway (Port 8080)
       run: |
         echo "Testing public connection to API over port 8080..."
         API_URL="http://${{ secrets.DO_DROPLET_IP }}:8080/GetMeEggs"
-
-        # Pull response, encforcing a connection timeout f the network blocks it
+        
+        # Pull response, enforcing a connection timeout if the network blocks it
         API_RESPONSE=$(curl -sSf --connect-timeout 10 "$API_URL")
         echo "API Response Received: $API_RESPONSE"
-
+        
         if echo "$API_RESPONSE" | grep -q "Here are some eggs!"; then
           echo "✅ PASSED: Backend cloud REST API gateway is live and responding externally!"
         else
-          echo "❌ FAILED: API did not return expected response. Check deployment logs for details."
+          echo "❌ FAILED: Backend API responded with unexpected data layout."
           exit 1
         fi
-      
-    - name: Verify Public MVP User interface (Port 80)
-      run: |
-        echo "Testing public connection to MVC front-end over port 80..."
-        MVC_URL="http://${{ secrets.DO_DROPLET_IP }}:80"
 
+    - name: Verify Public MVC User Interface (Port 80)
+      run: |
+        echo "Testing public connection to MVC Front-End over port 80..."
+        MVC_URL="http://${{ secrets.DO_DROPLET_IP }}:80"
+        
         MVC_HEADERS=$(curl -sI --connect-timeout 10 "$MVC_URL")
         echo "$MVC_HEADERS"
-
+        
         if echo "$MVC_HEADERS" | grep -qE "200 OK|302 Found|302 Moved"; then
-          echo "✅ PASSED: Front-end MVC application is public and handling connections flawlessly!"
+          echo "✅ PASSED: Front-End MVC application is public and handling connections flawlessly!"
         else
           echo "❌ FAILED: Front-End MVC application refused external connection handshakes."
           exit 1
