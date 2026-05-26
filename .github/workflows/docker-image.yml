@@ -121,6 +121,83 @@ jobs:
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     environment: production
     steps:
-    - name: Execute Server Infrastructure Sync
+    - name: Deploy via SSH to DigitalOcean Droplet
+      uses: appleboy/ssh-action@v1.2.0
+      with:
+        host: ${{ secrets.DO_DROPLET_IP }}
+        key: ${{ secrets.DO_SSH_KEY }}
+        username: root
+        timeout: 60s
+        command_timeout: 30m # Allowing extra time for Docker pull and container restarts during deployment
+        script: |
+          # Target project Directory on the remote server
+          PROJECT_DIR="dockerchicken"
+
+          # Force Git to explicitily use the droplet's  authorised deploy key file path context
+          export GIT_SSH_COMMAND="ssh -i /root/.ssh/id_ed25519 -o IdentitiesOnly=yes"
+
+          # Navigate into directory or pull repository via Git over SSH dynamically
+          if [ -d "$PROJECT_DIR" ]; then
+            cd "$PROJECT_DIR"
+            echo "Syncing remote context safely..."
+            git fetch --all
+            git reset --hard origin/${{ github.ref_name }}
+            git pull
+          else
+            echo "Initializing remte firectory workspace layout dynamically for ${{ github.repository }}..."
+            git clone git@github.com:${{ github.repository }}.git "$PROJECT_DIR"
+            cd "$PROJECT_DIR"
+          fi
+
+          # Bring down older services safely
+          echo "Stopping active container clusters..."
+          docker compose down
+
+          # Run the fresh build and up on the Droplet
+          echo "Initiating production runtime compilation environment..."
+          docker compose build -d --build
+
+          echo "Deployment completely executed successfully!"
+      
+  # JOB 5: Connects over the public internet to verify the deployment is accessible globally
+  post-deployment-smoke-test:
+    name: 🌐 Live Cloud Smoke Verification
+    runs-on: ubuntu-latest
+    needs: cd-deployment
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    steps:
+    - name: Settle Environment
       run: |
-        echo "All automated tests passed cleanly. Initiating production handshake scripts..."
+        echo "Allowing containers 15 seconds to fully complete initial production both cycles..."
+        sleep 15
+
+    - name: Verify Public REST API Gateway (Port 8080)
+      run: |
+        echo "Testing public connection to API over port 8080..."
+        API_URL="http://${{ secrets.DO_DROPLET_IP }}:8080/GetMeEggs"
+
+        # Pull response, encforcing a connection timeout f the network blocks it
+        API_RESPONSE=$(curl -sSf --connect-timeout 10 "$API_URL")
+        echo "API Response Received: $API_RESPONSE"
+
+        if echo "$API_RESPONSE" | grep -q "Here are some eggs!"; then
+          echo "✅ PASSED: Backend cloud REST API gateway is live and responding externally!"
+        else
+          echo "❌ FAILED: API did not return expected response. Check deployment logs for details."
+          exit 1
+        fi
+      
+    - name: Verify Public MVP User interface (Port 80)
+      run: |
+        echo "Testing public connection to MVC front-end over port 80..."
+        MVC_URL="http://${{ secrets.DO_DROPLET_IP }}:80"
+
+        MVC_HEADERS=$(curl -sI --connect-timeout 10 "$MVC_URL")
+        echo "$MVC_HEADERS"
+
+        if echo "$MVC_HEADERS" | grep -qE "200 OK|302 Found|302 Moved"; then
+          echo "✅ PASSED: Front-end MVC application is public and handling connections flawlessly!"
+        else
+          echo "❌ FAILED: Front-End MVC application refused external connection handshakes."
+          exit 1
+        fi
