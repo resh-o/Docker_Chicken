@@ -5,24 +5,24 @@ services:
       dockerfile: ./ChickDB/Dockerfile
     container_name: chick-db
     environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "Password1!"
-      MSSQL_PID: "Express"
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Password1!
+    # Explicitly lock down port 1433 to localhost loopback rules to secure data records from external internet explotation
     ports:
-      - "1433:1433"
-      - "1400:1433"  # Secondary port to avoid local SQL conflicts
-    volumes:
-      - db_data:/var/opt/mssql
-    restart: unless-stopped
+      - "127.0.0.1:1433:1433"
     networks:
       - chick-network
+    volumes:
+      - db_data:/var/opt/mssql
+
   mvc-service:
     build:
       context: .               # Root context to ensure file accessibility
       dockerfile: ./ChickMVC/Dockerfile  # Path to MVC Dockerfile
     container_name: mvc-chick-service-magic
     environment:
-      SQL_CONNECTION_STRING: "Server=chick-db;Database=Farm;Trusted_Connection=false;MultipleActiveResultSets=true;Encrypt=false;user id=sa;password=Password1!"
+      - SQL_CONNECTION_STRING=Server=chick-db;Database=Farm;Trusted_Connection=false;MultipleActiveResultSets=true;Encrypt=false;user id=sa;password=Password1!
+      - ASPNETCORE_URLS=http://0.0.0.0:8080
     ports:
       - "80:8080"
     depends_on:
@@ -36,11 +36,13 @@ services:
       dockerfile: ./ChickenAPI/Dockerfile
     container_name: api-chick-service
     environment:
-       SQL_CONNECTION_STRING: "Server=chick-db;Database=Farm;Trusted_Connection=false;MultipleActiveResultSets=true;Encrypt=false;user id=sa;password=Password1!"
+      - SQL_CONNECTION_STRING=Server=chick-db;Database=Farm;Trusted_Connection=false;MultipleActiveResultSets=true;Encrypt=false;user id=sa;password=Password1!
+      - ASPNETCORE_URLS=http://0.0.0.0:8080
     ports:
       - "8080:8080"
     depends_on:
-      - chick-db-service
+      chick-db-service:
+        condition: service_healthy
     networks:
       - chick-network
 

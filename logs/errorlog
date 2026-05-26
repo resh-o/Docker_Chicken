@@ -169,3 +169,12 @@
 2026-05-21 09:32:23.42 spid51      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
 2026-05-21 09:32:23.49 spid51      Parallel redo is started for database 'Farm' with worker pool size [4].
 2026-05-21 09:32:23.50 spid51      Parallel redo is shutdown for database 'Farm' with worker pool size [4].
+2026-05-21 09:38:06.83 spid68      Attempting to load library 'xplog70.dll' into memory. This is an informational message only. No user action is required.
+2026-05-21 09:38:06.90 spid68      Using 'xplog70.dll' version '2022.160.4255' to execute extended stored procedure 'xp_msver'. This is an informational message only; no user action is required.
+2026-05-21 09:38:12.81 spid68      [5]. Feature Status: PVS: 0. CTR: 0. ConcurrentPFSUpdate: 1. ConcurrentGAMUpdate: 1. ConcurrentSGAMUpdate: 1, CleanupUnderUserTransaction: 0. TranLevelPVS: 0
+2026-05-21 09:38:12.82 spid68      Starting up database 'Farm'.
+2026-05-21 09:38:12.82 spid68      RemoveStaleDbEntries: Cleanup of stale DB entries called for database ID: [5]
+2026-05-21 09:38:12.82 spid68      RemoveStaleDbEntries: Cleanup of stale DB entries skipped because master db is not memory optimized. DbId: 5.
+2026-05-21 09:38:12.93 spid68      Parallel redo is started for database 'Farm' with worker pool size [4].
+2026-05-21 09:38:12.95 spid68      Parallel redo is shutdown for database 'Farm' with worker pool size [4].
+2026-05-21 09:40:33.49 spid68      Using 'dbghelp.dll' version '4.0.5'
