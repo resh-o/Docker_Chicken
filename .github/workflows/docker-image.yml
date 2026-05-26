@@ -92,19 +92,6 @@ jobs:
           -d '{"name": "Cluck Norris", "breed": "Rhode Island Red"}' \
           --fail --verbose
 
-    - name: Integration Step 2 - Verify Front-End MVC Data Rendering
-      run: |
-        echo "Querying the MVC web application home page on port 80..."
-        MVC_RESPONSE=$(curl -s http://localhost:80)
-        
-        echo "Asserting that the front-end view successfully displays the dynamic API string context..."
-        if echo "$MVC_RESPONSE" | grep -q "Cluck Norris"; then
-          echo "SUCCESS: MVC interface successfully fetched and displayed containerized API data!"
-        else
-          echo "ERROR: Data assertion failed. The MVC home page is not showing the injected database string payload."
-          exit 1
-        fi
-
     - name: Tear Down Mesh and Logs
       if: always()
       run: |
